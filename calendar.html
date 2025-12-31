@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Scots Millennial Lunisolar Calendar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header>
   <h1>Scots Millennial Lunisolar Calendar</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="convert.html">Convert</a>
+    <a href="verify.html">Verify</a>
+    <a href="about-epoch.html">Epoch</a>
+  </nav>
 </header>
 
 <main>
   <div id="todayBanner" class="banner">Loading…</div>
 
-  <label>Year (1–334):</label>
-  <input id="yearInput" type="number" min="1" max="334">
-  <button onclick="render()">Show Year</button>
+  <div class="controls">
+    <label><strong>SMLC Year (1–334):</strong></label>
+    <input id="yearInput" type="number" min="1" max="334" />
+    <button id="showYearBtn">Show Year</button>
+  </div>
 
   <div id="output"></div>
 </main>
