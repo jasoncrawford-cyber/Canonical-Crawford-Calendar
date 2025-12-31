@@ -1,113 +1,51 @@
 // ===============================
-// The Crawford Calendar — Core Logic
+// Crawford Calendar — Core Logic
 // ===============================
 
-// Weekdays (continuous, never reset)
-const WEEKDAYS = [
-  "Foreday",
-  "Neistday",
-  "Midday",
-  "Gangday",
-  "Fendday",
-  "Restday",
-  "Yondday"
-];
+// Simple canonical mapping for now
+// (No lunar math yet — this is intentional)
 
-// Base months (leap month inserted conditionally)
-const BASE_MONTHS = [
-  ["Eastren", 30],
-  ["Spryng", 29],
-  ["Evenmarch", 30],
-  ["Blossom", 29],
-  ["Brightmonth", 30],
-  ["Midsomer", 29],
-  ["Stillheat", 30],
-  ["Harvest", 29],
-  ["Evenfall", 30],
-  ["Waning", 29],
-  ["Frostfall", 30],
-  ["Darkmonth", 29]
-];
-
-// Leap-month rule (334-year cycle)
-function isLeapMonthYear(year) {
-  const a = Math.floor((4131 * year) / 334);
-  const b = Math.floor((4131 * (year - 1)) / 334);
-  return a - b === 13;
-}
-
-// Fixed epoch: 20 March 2000
-function crawfordEpoch() {
-  return new Date(2000, 2, 20, 0, 0, 0);
-}
-
-// Whole days between dates
-function daysBetween(a, b) {
-  return Math.floor((b - a) / 86400000);
-}
-
-// Convert a Date → Crawford date object
 function crawfordFromDate(date) {
-  const epoch = crawfordEpoch();
-  const daysSinceEpoch = daysBetween(epoch, date);
+  // TEMPORARY canonical anchor:
+  // Gregorian Jan 1, 2025 → 1 Waning
+  const epoch = new Date(2025, 0, 1);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const daysSinceEpoch = Math.floor((date - epoch) / msPerDay);
 
-  // Weekday
-  const weekdayIndex = ((daysSinceEpoch % 7) + 7) % 7;
-  const weekday = WEEKDAYS[weekdayIndex];
-  const isWorkday = weekdayIndex <= 4;
+  const months = [
+    { name: "Eastren", length: 30 },
+    { name: "Spryng", length: 29 },
+    { name: "Evenmarch", length: 30 },
+    { name: "Blossom", length: 29 },
+    { name: "Brightmonth", length: 30 },
+    { name: "Midsomer", length: 29 },
+    { name: "High Midsomer", length: 29 },
+    { name: "Stillheat", length: 30 },
+    { name: "Harvest", length: 29 },
+    { name: "Evenfall", length: 30 },
+    { name: "Waning", length: 29 },
+    { name: "Frostfall", length: 30 },
+    { name: "Darkmonth", length: 29 }
+  ];
 
-  // Solar Era year (aligned with Gregorian)
-  const eraYear = date.getFullYear();
-  const cycle = Math.floor((eraYear - 1) / 334) + 1;
-  const yearInCycle = ((eraYear - 1) % 334) + 1;
+  let dayCount = daysSinceEpoch;
+  let year = 1;
+  let monthIndex = 0;
 
-  // Build month list
-  let months = [...BASE_MONTHS];
-  if (isLeapMonthYear(eraYear)) {
-    // Insert High Midsomer after Midsomer
-    months.splice(6, 0, ["High Midsomer", 29]);
-  }
-
- // Day of Crawford year (year starts on March 20)
-let crawfordYearStart = new Date(eraYear, 2, 20);
-
-// If date is before March 20, it belongs to previous Crawford year
-if (date < crawfordYearStart) {
-  crawfordYearStart = new Date(eraYear - 1, 2, 20);
-}
-
-let dayOfYear = daysBetween(crawfordYearStart, date) + 1;
-
-
-  let month = "";
-  let day = 0;
-
-  for (const [name, length] of months) {
-    if (dayOfYear <= length) {
-      month = name;
-      day = dayOfYear;
-      break;
+  while (dayCount >= months[monthIndex].length) {
+    dayCount -= months[monthIndex].length;
+    monthIndex++;
+    if (monthIndex >= months.length) {
+      monthIndex = 0;
+      year++;
     }
-    dayOfYear -= length;
   }
-
-  // Holidays
-  let holiday = null;
-  if (month === "Eastren" && day === 1) holiday = "Forelicht";
-  if (month === "Evenmarch" && day === 15) holiday = "Spring Equinox";
-  if (month === "Midsomer" && day === 15) holiday = "Midsomer";
-  if (month === "Evenfall" && day === 15) holiday = "Autumn Equinox";
-  if (month === "Darkmonth" && day === 15) holiday = "Christmas";
 
   return {
-    eraYear,
-    cycle,
-    yearInCycle,
-    month,
-    day,
-    weekday,
-    isWorkday,
-    holiday
+    year,
+    month: months[monthIndex].name,
+    day: dayCount + 1,
+    holiday: null
   };
 }
 
