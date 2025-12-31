@@ -43,9 +43,9 @@ const MONTH_NAMES = [
   "Harvest",
   "Evenfall",
   "Waning",
-  "Frostfall",
   "Darkmonth",
-  "Deepwinter"
+  "Deepwinter",
+  "Frostfall"
 ];
 
 // Weekday names (month-local)
