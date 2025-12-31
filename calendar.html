@@ -4,15 +4,10 @@
   <meta charset="UTF-8" />
   <title>Millennial Lunisolar Calendar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Global styles -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<!-- =====================================================
-     HEADER
-     ===================================================== -->
 <header>
   <h1>Millennial Lunisolar Calendar</h1>
   <nav>
@@ -23,57 +18,31 @@
   </nav>
 </header>
 
-<!-- =====================================================
-     MAIN CONTENT
-     ===================================================== -->
 <main>
 
-  <!-- ===== TODAY BANNER ===== -->
   <div id="todayBanner" class="banner">
     Loading today’s date…
   </div>
 
-  <!-- ===== YEAR SELECTOR ===== -->
-  <div style="margin-bottom: 1rem;">
-    <label for="yearInput">
-      <strong>MLC Year (1–334):</strong>
-    </label>
-    <input
-      id="yearInput"
-      type="number"
-      min="1"
-      max="334"
-      style="width: 6rem; margin-left: 0.5rem;"
-    />
+  <div style="margin-bottom:1rem;">
+    <label><strong>MLC Year (1–334):</strong></label>
+    <input id="yearInput" type="number" min="1" max="334" />
     <button onclick="render()">Show Year</button>
   </div>
 
-  <!-- ===== CALENDAR OUTPUT ===== -->
   <div id="output"></div>
 
 </main>
 
-<!-- =====================================================
-     SCRIPTS — ORDER IS CRITICAL
-     These MUST be at the very bottom of the page
-     ===================================================== -->
-
-<!-- Core calendar math -->
+<!-- 🔴 SCRIPT ORDER IS NON-NEGOTIABLE -->
 <script src="js/mlc-core.js"></script>
-
-<!-- Names (months, weekdays, seasons) -->
 <script src="js/names.js"></script>
-
-<!-- Gregorian ↔ JDN -->
 <script src="js/gregorian.js"></script>
-
-<!-- Easter calculation -->
 <script src="js/easter.js"></script>
-
-<!-- Epoch (single source of truth) -->
 <script src="js/epoch.js"></script>
-
-<!-- Absolute-day ↔ MLC conversion -->
 <script src="js/absolute.js"></script>
+<script src="js/holidays.js"></script>
+<script src="js/calendar.js"></script>
 
-<!-- Holidays (depends on al
+</body>
+</html>
