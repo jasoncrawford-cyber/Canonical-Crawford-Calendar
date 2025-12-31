@@ -68,7 +68,11 @@ section#month {
   color: #333;
 }
 
-
+#grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
 
 }
 
