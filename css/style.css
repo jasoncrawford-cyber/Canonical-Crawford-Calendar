@@ -33,7 +33,7 @@ main {
 }
 
 .hero {
-  max-width: 600px;
+  max-width: 640px;
 }
 
 .button {
@@ -50,14 +50,19 @@ main {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .day {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
 }
 
 .rest {
   background: var(--rest);
 }
 
+.today {
+  border: 2px solid var(--accent);
+}
