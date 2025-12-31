@@ -2,39 +2,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MLC Calendar</title>
+  <title>Date Conversion</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header>
-  <h1>Millennial Lunisolar Calendar</h1>
+  <h1>Date Conversion</h1>
   <nav>
     <a href="index.html">Home</a>
-    <a href="about-epoch.html">Epoch</a>
+    <a href="calendar.html">Calendar</a>
   </nav>
 </header>
 
 <main>
-  <div id="todayBanner" class="banner"></div>
+  <h2>Gregorian → MLC</h2>
 
-  <label>
-    Year (1–334):
-    <input id="yearInput" type="number" min="1" max="334" />
-  </label>
-  <button onclick="render()">Show Year</button>
+  <input id="gYear" type="number" placeholder="Year (e.g. 2025)" />
+  <input id="gMonth" type="number" placeholder="Month (1–12)" />
+  <input id="gDay" type="number" placeholder="Day" />
+  <button onclick="convertToMLC()">Convert</button>
 
-  <div id="output"></div>
+  <p id="mlcOut"></p>
+
+  <hr>
+
+  <h2>MLC → Gregorian</h2>
+
+  <input id="mYear" type="number" placeholder="MLC Year" />
+  <input id="mMonth" type="number" placeholder="Month (1–12)" />
+  <input id="mDay" type="number" placeholder="Day" />
+  <button onclick="convertToGregorian()">Convert</button>
+
+  <p id="gregOut"></p>
 </main>
 
 <script src="js/mlc-core.js"></script>
 <script src="js/names.js"></script>
 <script src="js/gregorian.js"></script>
 <script src="js/absolute.js"></script>
-<script src="js/easter.js"></script>
-<script src="js/holidays.js"></script>
-<script src="js/calendar.js"></script>
+<script src="js/epoch.js"></script>
 
+<script>
+function convertToMLC() {
+  const y = +gYear.value;
+  const m = +gMonth.value;
+  const d = +gDay.value;
+
+  if (!y || !m || !d) {
+    mlcOut.textContent = "Please enter a valid Gregorian date.";
+    return;
+  }
+
+  const jdn = gregorianToJDN(y, m, d);
+  const abs = jdn - EPOCH_JDN;
+  const mlc = absoluteToMLC(abs);
+
+  mlcOut.innerHTML = `
+    <strong>MLC:</strong>
+    ${MONTH_NAMES[mlc.monthIndex]} ${mlc.day}, Year ${mlc.year}
+  `;
+}
+
+function convertToGregorian() {
+  const y = +mYear.value;
+  const m = +mMonth.value;
+  const d = +mDay.value;
+
+  if (!y || !m || !d) {
+    gregOut.textContent = "Please enter a valid MLC date.";
+    return;
+  }
+
+  let abs = daysBeforeYear(y);
+  const months = generateMonths(y);
+
+  for (let i = 0; i < m - 1; i++) {
+    abs += months[i].length;
+  }
+  abs += d - 1;
+
+  const jdn = abs + EPOCH_JDN;
+  const greg = jdnToGregorian(jdn);
+
+  gregOut.innerHTML = `
+    <strong>Gregorian:</strong>
+    ${greg.year}-${String(greg.month).padStart(2, "0")}-${String(greg.day).padStart(2, "0")}
+  `;
+}
+</script>
 
 </body>
 </html>
