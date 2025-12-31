@@ -79,10 +79,11 @@ section#month {
 .day {
   background: #eaeaea;
   border-radius: 6px;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   text-align: center;
   font-size: 0.9rem;
 }
+
 
 .day.today {
   background: #ffd54f;
