@@ -1,17 +1,59 @@
 // ===============================
-// The Crawford Calendar — UI Logic (FINAL, SAFE)
+// The Crawford Calendar — App Logic
+// Canonical version aligned to PDF
 // ===============================
 
+const WEEKDAYS = [
+  "Foreday",
+  "Neistday",
+  "Midday",
+  "Gangday",
+  "Fendday",
+  "Restday",
+  "Yondday"
+];
+
+const MONTH_LENGTHS = {
+  "Eastren": 30,
+  "Spryng": 29,
+  "Evenmarch": 30,
+  "Blossom": 29,
+  "Brightmonth": 30,
+  "Midsomer": 29,
+  "High Midsomer": 29,
+  "Stillheat": 30,
+  "Harvest": 29,
+  "Evenfall": 30,
+  "Waning": 29,
+  "Frostfall": 30,
+  "Darkmonth": 29
+};
+
 function renderToday() {
-  const todayDate = new Date();
-  const c = crawfordFromDate(todayDate);
+  const today = new Date();
+  const c = crawfordFromDate(today);
 
-  // Primary Crawford display
-  document.getElementById("weekday").innerText = c.weekday;
-  document.getElementById("date").innerText = `${c.day} ${c.month}`;
+  // ─────────────────────────────
+  // Month name (PDF style)
+  // ─────────────────────────────
+  document.getElementById("month-name").innerText = c.month;
 
-  // Gregorian display
-  const gregorianText = todayDate.toLocaleDateString(undefined, {
+  // ─────────────────────────────
+  // Weekday (month-local, Firstday = 1)
+  // ─────────────────────────────
+  const localWeekday = WEEKDAYS[(c.day - 1) % 7];
+  document.getElementById("weekday").innerText = localWeekday;
+
+  // ─────────────────────────────
+  // Crawford date
+  // ─────────────────────────────
+  document.getElementById("date").innerText =
+    `${c.day} ${c.month}`;
+
+  // ─────────────────────────────
+  // Gregorian date (secondary)
+  // ─────────────────────────────
+  const gregorianText = today.toLocaleDateString(undefined, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -20,46 +62,34 @@ function renderToday() {
   document.getElementById("gregorian").innerText =
     `Gregorian: ${gregorianText}`;
 
+  // ─────────────────────────────
   // Work / Rest
+  // ─────────────────────────────
   document.getElementById("status").innerText =
-    c.isWorkday ? "Workday" : "Restday";
+    ["Foreday","Neistday","Midday","Gangday","Fendday"].includes(localWeekday)
+      ? "Workday"
+      : "Restday";
 
+  // ─────────────────────────────
   // Holiday display
+  // ─────────────────────────────
   document.getElementById("holiday").innerText =
     c.holiday ? `Holiday: ${c.holiday}` : "";
 
-  // Month grid — SAFE MODE
+  // ─────────────────────────────
+  // Month grid (PDF-aligned)
+  // ─────────────────────────────
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  // Determine month length from month name (no globals)
-  let daysInMonth = 29;
-  const monthLengths = {
-    "Eastren": 30,
-    "Spryng": 29,
-    "Evenmarch": 30,
-    "Blossom": 29,
-    "Brightmonth": 30,
-    "Midsomer": 29,
-    "High Midsomer": 29,
-    "Stillheat": 30,
-    "Harvest": 29,
-    "Evenfall": 30,
-    "Waning": 29,
-    "Frostfall": 30,
-    "Darkmonth": 29
-  };
+  const daysInMonth = MONTH_LENGTHS[c.month] || 29;
 
-  if (monthLengths[c.month]) {
-    daysInMonth = monthLengths[c.month];
-  }
-
-  for (let i = 1; i <= daysInMonth; i++) {
+  for (let day = 1; day <= daysInMonth; day++) {
     const cell = document.createElement("div");
     cell.className = "day";
-    cell.innerText = i;
+    cell.innerText = day;
 
-    if (i === c.day) {
+    if (day === c.day) {
       cell.classList.add("today");
     }
 
@@ -67,7 +97,6 @@ function renderToday() {
   }
 }
 
-// Run safely after page load
+// Run safely
 window.addEventListener("DOMContentLoaded", renderToday);
-
 
