@@ -1,11 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>The Crawford Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <h1>The Crawford Calendar</h1>
-  <p>If you can see this, GitHub Pages is working.</p>
+  <main id="app">
+    <h1 id="weekday">—</h1>
+    <h2 id="date">—</h2>
+
+    <div id="status"></div>
+    <div id="holiday"></div>
+
+    <section id="month">
+      <h3>This Month</h3>
+      <div id="grid"></div>
+    </section>
+
+    <footer>
+      <strong>The Crawford Calendar</strong><br />
+      <em>Time Weel Keepit</em>
+    </footer>
+  </main>
+
+  <script src="calendar.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
+
