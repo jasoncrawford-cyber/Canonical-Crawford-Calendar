@@ -1,46 +1,68 @@
-// TEMPORARY SAFE VERSION — NO calendar.js required
+// ===============================
+// Crawford Calendar App Renderer
+// ===============================
 
-const WEEKDAYS = [
-  "Foreday",
-  "Neistday",
-  "Midday",
-  "Gangday",
-  "Fendday",
-  "Restday",
-  "Yondday"
-];
+// Get DOM elements
+const weekdayEl = document.getElementById("weekday");
+const dateEl = document.getElementById("date");
+const gregorianEl = document.getElementById("gregorian");
+const statusEl = document.getElementById("status");
+const holidayEl = document.getElementById("holiday");
+const monthNameEl = document.getElementById("month-name");
+const gridEl = document.getElementById("grid");
 
-const MONTH = "Waning";
-const DAYS_IN_MONTH = 29;
-const TODAY = 12;
+// Get today in Crawford calendar
+const today = crawfordToday();
 
-function renderToday() {
-  const localWeekday = WEEKDAYS[(TODAY - 1) % 7];
+// ---------- Header ----------
+weekdayEl.textContent = today.weekday;
+dateEl.textContent = `${today.day} ${today.month}`;
+gregorianEl.textContent = `Gregorian: ${new Date().toDateString()}`;
+statusEl.textContent = "Workday";
+holidayEl.textContent = "";
 
-  document.getElementById("weekday").innerText = localWeekday;
-  document.getElementById("date").innerText = `${TODAY} ${MONTH}`;
-  document.getElementById("month-name").innerText = MONTH;
+// ---------- Month name ----------
+monthNameEl.textContent = today.month;
 
-  document.getElementById("gregorian").innerText =
-    "Gregorian: " + new Date().toDateString();
+// ---------- Render month grid ----------
+gridEl.innerHTML = "";
 
-  document.getElementById("status").innerText =
-    ["Foreday","Neistday","Midday","Gangday","Fendday"].includes(localWeekday)
-      ? "Workday"
-      : "Restday";
+// Find month length
+const monthIndex = (function () {
+  const baseMonths = [
+    "Eastren",
+    "Spryng",
+    "Evenmarch",
+    "Blossom",
+    "Brightmonth",
+    "Midsomer",
+    "Harvest",
+    "Evenfall",
+    "Waning",
+    "Frostfall",
+    "Darkmonth",
+    "Deepwinter"
+  ];
 
-  document.getElementById("holiday").innerText = "";
-
-  const grid = document.querySelector(".calendar-grid");
-  grid.querySelectorAll(".day").forEach(d => d.remove());
-
-  for (let d = 1; d <= DAYS_IN_MONTH; d++) {
-    const cell = document.createElement("div");
-    cell.className = "day";
-    cell.innerText = d;
-    if (d === TODAY) cell.classList.add("today");
-    grid.appendChild(cell);
+  let index = baseMonths.indexOf(today.month.replace(" (Leap)", ""));
+  if (today.month.includes("(Leap)")) {
+    return index + 1;
   }
+  return index;
+})();
+
+const daysInMonth = (monthIndex % 2 === 0) ? 30 : 29;
+
+// Build day cells
+for (let d = 1; d <= daysInMonth; d++) {
+  const cell = document.createElement("div");
+  cell.className = "day";
+  cell.textContent = d;
+
+  if (d === today.day) {
+    cell.classList.add("today");
+  }
+
+  gridEl.appendChild(cell);
 }
 
-window.addEventListener("DOMContentLoaded", renderToday);
