@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Date Conversion</title>
+  <title>Convert — Scots Millennial Lunisolar Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -12,41 +13,37 @@
   <nav>
     <a href="index.html">Home</a>
     <a href="calendar.html">Calendar</a>
+    <a href="verify.html">Verify</a>
   </nav>
 </header>
 
 <main>
-  <h2>Gregorian → MLC</h2>
+  <div id="convertStatus" class="banner">Ready.</div>
 
-  <input id="gYear" type="number" placeholder="Year" />
-  <input id="gMonth" type="number" placeholder="Month" />
-  <input id="gDay" type="number" placeholder="Day" />
-  <button onclick="convertToMLC()">Convert</button>
+  <h2>Gregorian → SMLC</h2>
+  <div class="controls">
+    <input id="gY" type="number" placeholder="Year (e.g. 2025)" />
+    <input id="gM" type="number" placeholder="Month (1–12)" />
+    <input id="gD" type="number" placeholder="Day" />
+    <button id="gToSBtn">Convert</button>
+  </div>
+  <p id="gToSOut"></p>
 
-  <p id="mlcOut"></p>
+  <hr>
+
+  <h2>SMLC → Gregorian</h2>
+  <div class="controls">
+    <input id="sY" type="number" placeholder="SMLC Year (1–334)" />
+    <input id="sMo" type="number" placeholder="Month number (1–13*)" />
+    <input id="sD" type="number" placeholder="Day" />
+    <button id="sToGBtn">Convert</button>
+  </div>
+  <p class="small-muted">*In leap years, month count is 13 (Month 7 is the Leap copy of Month 6).</p>
+  <p id="sToGOut"></p>
 </main>
 
-<script src="js/mlc-core.js"></script>
-<script src="js/names.js"></script>
-<script src="js/gregorian.js"></script>
-<script src="js/absolute.js"></script>
-
-<script>
-function convertToMLC() {
-  const y = +gYear.value;
-  const m = +gMonth.value;
-  const d = +gDay.value;
-
-  const jdn = gregorianToJDN(y, m, d);
-  const abs = jdn - EPOCH_JDN;
-  const mlc = absoluteToMLC(abs);
-
-  mlcOut.innerHTML = `
-    <strong>MLC:</strong>
-    ${MONTH_NAMES[mlc.monthIndex]} ${mlc.day}, Year ${mlc.year}
-  `;
-}
-</script>
+<script src="js/smlc.js"></script>
+<script src="js/convert.js"></script>
 
 </body>
 </html>
