@@ -1,3 +1,5 @@
+alert("CMLC calendar.js LOADED — VERSION TEST");
+
 // =====================================================
 // Crawford Millennial Lunisolar Calendar (CMLC)
 // Canonical Core Logic — v1.0 (LOCKED)
