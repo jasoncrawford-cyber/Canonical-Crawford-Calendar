@@ -65,7 +65,5 @@ function renderToday() {
 document.addEventListener("DOMContentLoaded", renderToday);
 
 // Offline support
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+
 
