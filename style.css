@@ -1,1 +1,77 @@
+/* ===============================
+   Crawford Calendar — Styling
+   =============================== */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f3f3f3;
+  color: #111;
+}
+
+main {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #444;
+}
+
+#status {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#holiday {
+  color: #b00020;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+section#month {
+  margin-top: 1.5rem;
+}
+
+#month h3 {
+  margin-bottom: 0.5rem;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+
+.day {
+  background: #eaeaea;
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.day.today {
+  background: #ffd54f;
+  font-weight: 700;
+}
+
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+}
 
