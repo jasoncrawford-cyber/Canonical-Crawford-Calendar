@@ -1,15 +1,14 @@
-function gregorianToJDN(y, m, d) {
-  const a = Math.floor((14 - m) / 12);
-  const y2 = y + 4800 - a;
-  const m2 = m + 12 * a - 3;
+function jdnToGregorian(jdn) {
+  const a = jdn + 32044;
+  const b = Math.floor((4 * a + 3) / 146097);
+  const c = a - Math.floor((146097 * b) / 4);
+  const d = Math.floor((4 * c + 3) / 1461);
+  const e = c - Math.floor((1461 * d) / 4);
+  const m = Math.floor((5 * e + 2) / 153);
 
-  return (
-    d +
-    Math.floor((153 * m2 + 2) / 5) +
-    365 * y2 +
-    Math.floor(y2 / 4) -
-    Math.floor(y2 / 100) +
-    Math.floor(y2 / 400) -
-    32045
-  );
+  const day = e - Math.floor((153 * m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = b * 100 + d - 4800 + Math.floor(m / 10);
+
+  return { year, month, day };
 }
