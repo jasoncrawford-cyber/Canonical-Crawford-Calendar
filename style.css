@@ -57,7 +57,7 @@ section#month {
 }
 
 #grid {
-  #weekday-header {
+#weekday-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   font-size: 0.75rem;
@@ -66,6 +66,7 @@ section#month {
   margin-bottom: 0.3rem;
   color: #333;
 }
+
 
 }
 
