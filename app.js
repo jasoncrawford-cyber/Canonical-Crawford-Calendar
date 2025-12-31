@@ -1,69 +1,63 @@
 // ===============================
-// The Crawford Calendar — UI Logic (FIXED)
+// The Crawford Calendar — UI Logic (HARD FIX)
 // ===============================
 
 function renderToday() {
   const todayDate = new Date();
+
+  // Force fresh calculation
   const c = crawfordFromDate(todayDate);
 
-  // Defensive checks (prevents "0" bug)
-  document.getElementById("weekday").textContent =
-    typeof c.weekday === "string" ? c.weekday : "—";
+  // EXPLICIT weekday mapping (no ambiguity)
+  const weekdayText = String(c.weekday);
 
-  document.getElementById("date").textContent =
-    `${c.day} ${c.month}`;
-
-  document.getElementById("status").textContent =
+  document.getElementById("weekday").innerText = weekdayText;
+  document.getElementById("date").innerText = `${c.day} ${c.month}`;
+  document.getElementById("status").innerText =
     c.isWorkday ? "Workday" : "Restday";
 
-  document.getElementById("holiday").textContent =
+  document.getElementById("holiday").innerText =
     c.holiday ? c.holiday : "";
 
-  // Determine month length properly (including leap months)
+  // DEBUG OUTPUT (temporary, visible proof)
+  const debug = document.createElement("pre");
+  debug.style.fontSize = "10px";
+  debug.style.textAlign = "left";
+  debug.textContent = JSON.stringify(c, null, 2);
+
+  const app = document.getElementById("app");
+  const oldDebug = document.getElementById("debug");
+  if (oldDebug) oldDebug.remove();
+
+  debug.id = "debug";
+  app.appendChild(debug);
+
+  // Month grid — safe version
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
   let months = [...BASE_MONTHS];
   if (isLeapMonthYear(c.eraYear)) {
     months.splice(6, 0, ["High Midsomer", 29]);
   }
 
   let daysInMonth = 29;
-  for (const [name, length] of months) {
+  for (const [name, len] of months) {
     if (name === c.month) {
-      daysInMonth = length;
+      daysInMonth = len;
       break;
     }
   }
-
-  // Month grid
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
 
   for (let i = 1; i <= daysInMonth; i++) {
     const cell = document.createElement("div");
     cell.className = "day";
     cell.innerHTML = `<strong>${i}</strong>`;
-
-    if (i === c.day) {
-      cell.classList.add("today");
-    }
-
-    // Holiday labels
-    if (
-      (c.month === "Eastren" && i === 1) ||
-      (c.month === "Evenmarch" && i === 15) ||
-      (c.month === "Midsomer" && i === 15) ||
-      (c.month === "Evenfall" && i === 15) ||
-      (c.month === "Darkmonth" && i === 15)
-    ) {
-      cell.innerHTML += "<br><small>Holiday</small>";
-    }
-
+    if (i === c.day) cell.classList.add("today");
     grid.appendChild(cell);
   }
 }
 
-// Run on load
-document.addEventListener("DOMContentLoaded", renderToday);
-
-// Offline support
-
+// GUARANTEED execution
+window.onload = renderToday;
 
