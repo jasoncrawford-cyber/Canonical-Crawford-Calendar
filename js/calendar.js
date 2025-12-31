@@ -1,8 +1,15 @@
-const EPOCH_JDN = gregorianToJDN(2000, 3, 20); 
-// Epoch: Spring Equinox anchor (see about-epoch.html)
+const EPOCH_JDN = gregorianToJDN(2000, 3, 20);
 
 function loadToday() {
   const now = new Date();
+
+  const gregorianText =
+    now.getFullYear() +
+    "-" +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(now.getDate()).padStart(2, "0");
+
   const jdn = gregorianToJDN(
     now.getFullYear(),
     now.getMonth() + 1,
@@ -13,17 +20,24 @@ function loadToday() {
   const today = absoluteToMLC(absDay);
 
   document.getElementById("yearInput").value = today.year;
-  render(today, absDay);
+
+  // Banner
+  const banner = document.getElementById("todayBanner");
+  banner.innerHTML = `
+    <strong>Today (MLC):</strong>
+    ${MONTH_NAMES[today.monthIndex]} ${today.day}, Year ${today.year}<br>
+    <em>Gregorian:</em> ${gregorianText}
+  `;
+
+  render(today);
 }
 
-function render(highlight = null, highlightAbs = null) {
+function render(highlight = null) {
   const year = parseInt(document.getElementById("yearInput").value, 10);
   const months = generateMonths(year);
   const out = document.getElementById("output");
 
   out.innerHTML = "";
-
-  let absCursor = daysBeforeYear(year);
 
   months.forEach((m, idx) => {
     const baseIndex = idx > 6 && m.leap ? idx - 1 : idx;
@@ -41,21 +55,31 @@ function render(highlight = null, highlightAbs = null) {
       const cell = document.createElement("div");
       cell.className = "day";
 
-      const weekday = WEEKDAYS[absCursor % 7];
+      // 🔒 FIXED RULE: every month starts on Foreday
+      const weekday = WEEKDAYS[(d - 1) % 7];
+
       if (weekday === "Restday" || weekday === "Yondday") {
         cell.classList.add("rest");
       }
 
-      if (highlightAbs === absCursor) {
+      if (
+        highlight &&
+        highlight.year === year &&
+        highlight.monthIndex === idx &&
+        highlight.day === d
+      ) {
         cell.classList.add("today");
       }
 
       const holiday = getHoliday(year, idx, d);
-      cell.innerHTML = `<strong>${d}</strong><br>${weekday}` +
-        (holiday ? `<br><em>${holiday}</em>` : "");
+
+      cell.innerHTML = `
+        <strong>${d}</strong><br>
+        ${weekday}
+        ${holiday ? `<br><em>${holiday}</em>` : ""}
+      `;
 
       grid.appendChild(cell);
-      absCursor++;
     }
 
     out.appendChild(grid);
