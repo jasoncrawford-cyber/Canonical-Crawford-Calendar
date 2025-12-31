@@ -31,7 +31,7 @@ function isLeapMonthYear(seYear) {
   return (a - b) === 13;
 }
 
-// Epoch: first new moon nearest March equinox, 2000
+const EPOCH = new Date(Date.UTC(2000, 2, 24, 5, 28, 0));
 // (Numerically fixed once; no observation required)
 const EPOCH = new Date(Date.UTC(2000, 2, 20)); 
 // NOTE: placeholder UTC date — can be refined to exact astronomical timestamp
