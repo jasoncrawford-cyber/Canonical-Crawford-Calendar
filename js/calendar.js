@@ -1,5 +1,3 @@
-const EPOCH_JDN = gregorianToJDN(2000, 3, 20);
-
 function loadToday() {
   const now = new Date();
 
@@ -46,9 +44,9 @@ function render(highlight = null) {
       : MONTH_NAMES[baseIndex];
     out.appendChild(title);
 
-    // ✅ Weekday header row
+    // Weekday header row
     const header = document.createElement("div");
-    header.className = "calendar header";
+    header.className = "calendar";
     WEEKDAYS.forEach(w => {
       const h = document.createElement("div");
       h.className = "day weekday-header";
@@ -64,7 +62,6 @@ function render(highlight = null) {
       const cell = document.createElement("div");
       cell.className = "day";
 
-      // 🔒 Month-local weekday cycle
       const weekday = WEEKDAYS[(d - 1) % 7];
 
       if (weekday === "Restday" || weekday === "Yondday") {
