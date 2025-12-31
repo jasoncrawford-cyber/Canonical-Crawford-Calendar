@@ -18,7 +18,7 @@ body {
 }
 
 header {
-  padding: 1rem 2rem;
+  padding: 1rem;
   background: white;
   border-bottom: 1px solid #ddd;
 }
@@ -30,27 +30,34 @@ nav a {
 }
 
 main {
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .banner {
   background: #fff8c4;
   border: 1px solid #e6d200;
-  padding: 1rem;
-  margin-bottom: 2rem;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 0.3rem;
+  margin-bottom: 1.5rem;
 }
 
 .day {
   padding: 0.4rem;
   border: 1px solid #ccc;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  min-height: 3.2em;
+}
+
+.weekday-header {
+  font-weight: bold;
+  background: #f0f0f0;
+  text-align: center;
 }
 
 .rest {
@@ -62,3 +69,19 @@ main {
   border: 2px solid #c9b800;
 }
 
+/* 📱 Mobile tuning */
+@media (max-width: 600px) {
+  h1, h3 {
+    font-size: 1.1rem;
+  }
+
+  .day {
+    font-size: 0.7rem;
+    padding: 0.3rem;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
