@@ -30,6 +30,13 @@ h2 {
   color: #444;
 }
 
+#gregorian {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+}
+
+
 #status {
   font-weight: 600;
   margin-bottom: 0.5rem;
