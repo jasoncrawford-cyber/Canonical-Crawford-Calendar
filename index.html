@@ -5,36 +5,32 @@
   <title>The Crawford Calendar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
 </head>
-  
+
 <body>
-  <main id="app">
-   <h1 id="weekday">—</h1>
-<h2 id="date">—</h2>
+  <main>
+    <h1 id="weekday"></h1>
+    <h2 id="date"></h2>
 
-<div id="gregorian"></div>
+    <div id="gregorian"></div>
+    <div id="status"></div>
+    <div id="holiday"></div>
 
-<div id="status"></div>
-<div id="holiday"></div>
+    <section id="month">
+      <h3 id="month-name"></h3>
 
-  <section id="month">
-  <h3 id="month-name"></h3>
-
-  <div id="weekday-header" style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:600;">
-    <div>Foreday</div>
-    <div>Neistday</div>
-    <div>Midday</div>
-    <div>Gangday</div>
-    <div>Fendday</div>
-    <div>Restday</div>
-    <div>Yondday</div>
-  </div>
-
-  <div id="grid"></div>
-</section>
-
+      <div class="calendar-grid">
+        <div class="weekday">Foreday</div>
+        <div class="weekday">Neistday</div>
+        <div class="weekday">Midday</div>
+        <div class="weekday">Gangday</div>
+        <div class="weekday">Fendday</div>
+        <div class="weekday">Restday</div>
+        <div class="weekday">Yondday</div>
+        <!-- days injected by JS -->
+      </div>
+    </section>
 
     <footer>
       <strong>The Crawford Calendar</strong><br />
