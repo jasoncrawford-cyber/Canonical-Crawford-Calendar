@@ -1,6 +1,6 @@
 // ===============================
-// The Crawford Calendar — App Logic
-// Canonical version aligned to PDF
+// Crawford Calendar — App Logic
+// Single-grid, PDF-aligned version
 // ===============================
 
 const WEEKDAYS = [
@@ -33,54 +33,37 @@ function renderToday() {
   const today = new Date();
   const c = crawfordFromDate(today);
 
-  // ─────────────────────────────
-  // Month name (PDF style)
-  // ─────────────────────────────
+  // Month + weekday (month-local, Day 1 = Foreday)
+  const localWeekday = WEEKDAYS[(c.day - 1) % 7];
+
+  document.getElementById("weekday").innerText = localWeekday;
+  document.getElementById("date").innerText = `${c.day} ${c.month}`;
   document.getElementById("month-name").innerText = c.month;
 
-  // ─────────────────────────────
-  // Weekday (month-local, Firstday = 1)
-  // ─────────────────────────────
-  const localWeekday = WEEKDAYS[(c.day - 1) % 7];
-  document.getElementById("weekday").innerText = localWeekday;
-
-  // ─────────────────────────────
-  // Crawford date
-  // ─────────────────────────────
-  document.getElementById("date").innerText =
-    `${c.day} ${c.month}`;
-
-  // ─────────────────────────────
-  // Gregorian date (secondary)
-  // ─────────────────────────────
-  const gregorianText = today.toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
+  // Gregorian date
   document.getElementById("gregorian").innerText =
-    `Gregorian: ${gregorianText}`;
+    "Gregorian: " + today.toLocaleDateString(undefined, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
 
-  // ─────────────────────────────
   // Work / Rest
-  // ─────────────────────────────
   document.getElementById("status").innerText =
     ["Foreday","Neistday","Midday","Gangday","Fendday"].includes(localWeekday)
       ? "Workday"
       : "Restday";
 
-  // ─────────────────────────────
-  // Holiday display
-  // ─────────────────────────────
+  // Holiday
   document.getElementById("holiday").innerText =
     c.holiday ? `Holiday: ${c.holiday}` : "";
 
-  // ─────────────────────────────
-  // Month grid (PDF-aligned)
-  // ─────────────────────────────
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
+  // Calendar grid
+  const grid = document.querySelector(".calendar-grid");
+
+  // Remove previous day cells (keep weekday headers)
+  grid.querySelectorAll(".day").forEach(d => d.remove());
 
   const daysInMonth = MONTH_LENGTHS[c.month] || 29;
 
@@ -97,6 +80,4 @@ function renderToday() {
   }
 }
 
-// Run safely
 window.addEventListener("DOMContentLoaded", renderToday);
-
