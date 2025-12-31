@@ -21,9 +21,7 @@ function loadToday() {
 
   document.getElementById("yearInput").value = today.year;
 
-  // Banner
-  const banner = document.getElementById("todayBanner");
-  banner.innerHTML = `
+  document.getElementById("todayBanner").innerHTML = `
     <strong>Today (MLC):</strong>
     ${MONTH_NAMES[today.monthIndex]} ${today.day}, Year ${today.year}<br>
     <em>Gregorian:</em> ${gregorianText}
@@ -48,6 +46,17 @@ function render(highlight = null) {
       : MONTH_NAMES[baseIndex];
     out.appendChild(title);
 
+    // ✅ Weekday header row
+    const header = document.createElement("div");
+    header.className = "calendar header";
+    WEEKDAYS.forEach(w => {
+      const h = document.createElement("div");
+      h.className = "day weekday-header";
+      h.textContent = w;
+      header.appendChild(h);
+    });
+    out.appendChild(header);
+
     const grid = document.createElement("div");
     grid.className = "calendar";
 
@@ -55,7 +64,7 @@ function render(highlight = null) {
       const cell = document.createElement("div");
       cell.className = "day";
 
-      // 🔒 FIXED RULE: every month starts on Foreday
+      // 🔒 Month-local weekday cycle
       const weekday = WEEKDAYS[(d - 1) % 7];
 
       if (weekday === "Restday" || weekday === "Yondday") {
@@ -75,8 +84,7 @@ function render(highlight = null) {
 
       cell.innerHTML = `
         <strong>${d}</strong><br>
-        ${weekday}
-        ${holiday ? `<br><em>${holiday}</em>` : ""}
+        ${holiday ? `<em>${holiday}</em>` : ""}
       `;
 
       grid.appendChild(cell);
