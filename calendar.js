@@ -2,29 +2,10 @@
 // Crawford Millennial Lunisolar Calendar (CMLC)
 // Canonical Core Logic — v1.0 (LOCKED)
 // =====================================================
-//
-// Epoch (immutable):
-// Solar Era (SE) Year 1 begins at the first new moon
-// nearest the March equinox of Gregorian year 2000 CE.
-//
-// Astronomical instant:
-// 24 March 2000, 05:28:00 UTC
-//
-// This instant defines:
-// SE 1
-// Cycle 1, Year 1
-// Eastren 1
-// Foreday
-//
-// No further astronomical observation is required.
-// =====================================================
 
-
-// -------------------------------
-// Constants
-// -------------------------------
-
-// Locked astronomical epoch
+// Locked astronomical epoch:
+// First new moon nearest March equinox, 2000 CE
+// 24 March 2000, 05:28 UTC
 const EPOCH = new Date(Date.UTC(2000, 2, 24, 5, 28, 0));
 const MS_PER_DAY = 86400000;
 
@@ -32,7 +13,7 @@ const MS_PER_DAY = 86400000;
 const YEARS_PER_CYCLE = 334;
 const MONTHS_PER_CYCLE = 4131;
 
-// Month names (canonical order)
+// Canonical month names (SEASONALLY ALIGNED)
 const MONTH_NAMES = [
   "Eastren",
   "Spryng",
@@ -48,7 +29,7 @@ const MONTH_NAMES = [
   "Frostfall"
 ];
 
-// Weekday names (month-local)
+// Weekdays (month-local)
 const WEEKDAYS = [
   "Foreday",
   "Neistday",
@@ -59,41 +40,24 @@ const WEEKDAYS = [
   "Yondday"
 ];
 
-
-// -------------------------------
-// Month length (lunar-true)
-// Month 1 = 30 days, alternating
-// -------------------------------
+// Lunar month length (30/29 alternating, Month 1 = 30)
 function monthLength(index) {
-  return (index % 2 === 0) ? 30 : 29;
+  return index % 2 === 0 ? 30 : 29;
 }
 
-
-// -------------------------------
-// Exact leap-month rule
-// (Non-negotiable; closed-form)
-// -------------------------------
+// Exact leap-month rule (334-year cycle)
 function isLeapMonthYear(seYear) {
   const a = Math.floor((MONTHS_PER_CYCLE * seYear) / YEARS_PER_CYCLE);
   const b = Math.floor((MONTHS_PER_CYCLE * (seYear - 1)) / YEARS_PER_CYCLE);
   return (a - b) === 13;
 }
 
-
-// -------------------------------
-// Core conversion function
-// Gregorian Date → Crawford Date
-// -------------------------------
+// Gregorian → Crawford
 function crawfordFromDate(date) {
-
-  // Days since epoch (UTC-based, deterministic)
   let days = Math.floor((date.getTime() - EPOCH.getTime()) / MS_PER_DAY);
-
-  // ---------------------------
-  // Resolve Solar Era year
-  // ---------------------------
   let seYear = 1;
 
+  // Resolve year
   while (true) {
     const monthsInYear = 12 + (isLeapMonthYear(seYear) ? 1 : 0);
     let yearLength = 0;
@@ -103,23 +67,19 @@ function crawfordFromDate(date) {
     }
 
     if (days < yearLength) break;
-
     days -= yearLength;
     seYear++;
   }
 
-  // ---------------------------
-  // Build month list for year
-  // ---------------------------
+  // Build months for year
   let months = [];
-
   for (let i = 0; i < 12; i++) {
     months.push({
       name: MONTH_NAMES[i],
       length: monthLength(i)
     });
 
-    // Insert leap month after Month 6
+    // Leap month after Month 6
     if (i === 5 && isLeapMonthYear(seYear)) {
       months.push({
         name: MONTH_NAMES[i] + " (Leap)",
@@ -128,17 +88,33 @@ function crawfordFromDate(date) {
     }
   }
 
-  // ---------------------------
-  // Resolve month & day
-  // ---------------------------
-  let monthIndex = 0;
-
-  while (days >= months[monthIndex].length) {
-    days -= months[monthIndex].length;
-    monthIndex++;
+  // Resolve month/day
+  let m = 0;
+  while (days >= months[m].length) {
+    days -= months[m].length;
+    m++;
   }
 
-  const dayOfMonth = days + 1;
+  const day = days + 1;
+  const weekday = WEEKDAYS[(day - 1) % 7];
+
+  const cycle = Math.floor((seYear - 1) / YEARS_PER_CYCLE) + 1;
+  const yearInCycle = ((seYear - 1) % YEARS_PER_CYCLE) + 1;
+
+  return {
+    eraYear: seYear,
+    cycle,
+    yearInCycle,
+    month: months[m].name,
+    day,
+    weekday
+  };
+}
+
+function crawfordToday() {
+  return crawfordFromDate(new Date());
+}
+
 
   // ---------------------------
   // Weekday (month-local)
