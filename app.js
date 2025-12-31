@@ -1,14 +1,17 @@
 // ===============================
-// The Crawford Calendar — UI Logic
+// The Crawford Calendar — UI Logic (FIXED)
 // ===============================
 
 function renderToday() {
   const todayDate = new Date();
   const c = crawfordFromDate(todayDate);
 
-  // Top display
-  document.getElementById("weekday").textContent = c.weekday;
-  document.getElementById("date").textContent = `${c.day} ${c.month}`;
+  // Defensive checks (prevents "0" bug)
+  document.getElementById("weekday").textContent =
+    typeof c.weekday === "string" ? c.weekday : "—";
+
+  document.getElementById("date").textContent =
+    `${c.day} ${c.month}`;
 
   document.getElementById("status").textContent =
     c.isWorkday ? "Workday" : "Restday";
@@ -16,17 +19,23 @@ function renderToday() {
   document.getElementById("holiday").textContent =
     c.holiday ? c.holiday : "";
 
-  // Month grid
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
+  // Determine month length properly (including leap months)
+  let months = [...BASE_MONTHS];
+  if (isLeapMonthYear(c.eraYear)) {
+    months.splice(6, 0, ["High Midsomer", 29]);
+  }
 
   let daysInMonth = 29;
-  for (const [name, length] of BASE_MONTHS) {
+  for (const [name, length] of months) {
     if (name === c.month) {
       daysInMonth = length;
       break;
     }
   }
+
+  // Month grid
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
   for (let i = 1; i <= daysInMonth; i++) {
     const cell = document.createElement("div");
@@ -37,7 +46,7 @@ function renderToday() {
       cell.classList.add("today");
     }
 
-    // Holiday labels inside grid
+    // Holiday labels
     if (
       (c.month === "Eastren" && i === 1) ||
       (c.month === "Evenmarch" && i === 15) ||
@@ -53,7 +62,7 @@ function renderToday() {
 }
 
 // Run on load
-renderToday();
+document.addEventListener("DOMContentLoaded", renderToday);
 
 // Offline support
 if ("serviceWorker" in navigator) {
