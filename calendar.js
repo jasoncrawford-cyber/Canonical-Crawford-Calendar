@@ -68,9 +68,16 @@ function crawfordFromDate(date) {
     months.splice(6, 0, ["High Midsomer", 29]);
   }
 
-  // Day of year
-  const startOfYear = new Date(eraYear, 0, 1);
-  let dayOfYear = daysBetween(startOfYear, date) + 1;
+ // Day of Crawford year (year starts on March 20)
+let crawfordYearStart = new Date(eraYear, 2, 20);
+
+// If date is before March 20, it belongs to previous Crawford year
+if (date < crawfordYearStart) {
+  crawfordYearStart = new Date(eraYear - 1, 2, 20);
+}
+
+let dayOfYear = daysBetween(crawfordYearStart, date) + 1;
+
 
   let month = "";
   let day = 0;
