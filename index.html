@@ -2,45 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>The Crawford Calendar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <link rel="stylesheet" href="style.css" />
+  <title>Crawford Lunisolar Calendar</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
-  <main>
-    <h1 id="weekday"></h1>
-    <h2 id="date"></h2>
 
-    <div id="gregorian"></div>
-    <div id="status"></div>
-    <div id="holiday"></div>
+<header>
+  <h1>Millennial Lunisolar Calendar</h1>
+  <nav>
+    <a href="calendar.html">Calendar</a>
+    <a href="convert.html">Convert</a>
+    <a href="about.html">About</a>
+  </nav>
+</header>
 
-    <section id="month">
-      <h3 id="month-name"></h3>
+<main>
+  <section class="hero">
+    <h2>Exact. Drift-Free. Human-Rhythmic.</h2>
+    <p>
+      A 334-year fixed lunisolar calendar with exact astronomical closure.
+    </p>
+    <a class="button" href="calendar.html">Open Calendar</a>
+  </section>
+</main>
 
-      <div class="calendar-grid">
-        <div class="weekday">Foreday</div>
-        <div class="weekday">Neistday</div>
-        <div class="weekday">Midday</div>
-        <div class="weekday">Gangday</div>
-        <div class="weekday">Fendday</div>
-        <div class="weekday">Restday</div>
-        <div class="weekday">Yondday</div>
-        <!-- days injected by JS -->
-      </div>
-    </section>
-
-    <footer>
-      <strong>The Crawford Calendar</strong><br />
-      <em>Time Weel Keepit</em>
-    </footer>
-  </main>
-
-  <script src="calendar.js"></script>
-<script src="app.js"></script>
+<footer>
+  <p>© Crawford Lunisolar Project</p>
+</footer>
 
 </body>
 </html>
-
