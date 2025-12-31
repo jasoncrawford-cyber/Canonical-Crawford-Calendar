@@ -3,37 +3,41 @@
 
   const SMLC = {};
 
-  /* =========================
-     CONSTANTS
-     ========================= */
+  // ===== Constants =====
   SMLC.CYCLE_YEARS = 334;
   SMLC.TOTAL_MONTHS = 4131;
 
   SMLC.MONTH_NAMES = [
-    "Eastren", "Spryng", "Evenmarch", "Blossom",
-    "Brightmonth", "Midsomer", "Stillheat", "Harvest",
-    "Evenfall", "Waning", "Frostfall", "Darkmonth"
+    "Eastren","Spryng","Evenmarch","Blossom","Brightmonth","Midsomer",
+    "Stillheat","Harvest","Evenfall","Waning","Frostfall","Darkmonth"
   ];
 
   SMLC.WEEKDAYS = [
-    "Foreday", "Neistday", "Midday",
-    "Gangday", "Fendday", "Restday", "Yondday"
+    "Foreday","Neistday","Midday","Gangday","Fendday","Restday","Yondday"
   ];
 
-  /* =========================
-     GREGORIAN ↔ JDN
-     ========================= */
+  // Seasonal anchors (fixed in SMLC)
+  SMLC.SEASONS = [
+    { name:"Spring Equinox", monthIndex:2, day:16 },
+    { name:"Summer Solstice", monthIndex:5, day:16 },
+    { name:"Autumn Equinox", monthIndex:8, day:16 },
+    { name:"Winter Solstice", monthIndex:11, day:16 }
+  ];
+
+  // ===== Gregorian <-> JDN =====
   SMLC.gregorianToJDN = function (y, m, d) {
     const a = Math.floor((14 - m) / 12);
     const y2 = y + 4800 - a;
     const m2 = m + 12 * a - 3;
-    return d +
+    return (
+      d +
       Math.floor((153 * m2 + 2) / 5) +
       365 * y2 +
       Math.floor(y2 / 4) -
       Math.floor(y2 / 100) +
       Math.floor(y2 / 400) -
-      32045;
+      32045
+    );
   };
 
   SMLC.jdnToGregorian = function (jdn) {
@@ -44,27 +48,25 @@
     const e = c - Math.floor((1461 * d) / 4);
     const m = Math.floor((5 * e + 2) / 153);
 
-    return {
-      year: b * 100 + d - 4800 + Math.floor(m / 10),
-      month: m + 3 - 12 * Math.floor(m / 10),
-      day: e - Math.floor((153 * m + 2) / 5) + 1
-    };
+    const day = e - Math.floor((153 * m + 2) / 5) + 1;
+    const month = m + 3 - 12 * Math.floor(m / 10);
+    const year = b * 100 + d - 4800 + Math.floor(m / 10);
+    return { year, month, day };
   };
 
-  /* =========================
-     EPOCH
-     ========================= */
+  // ===== Epoch =====
+  // SMLC Year 1, Eastren 1 = Gregorian 2000-03-20
   SMLC.EPOCH_JDN = SMLC.gregorianToJDN(2000, 3, 20);
 
-  /* =========================
-     LEAP MONTH LOGIC
-     ========================= */
+  // ===== Leap-month rule =====
   SMLC.isLeapYear = function (y) {
-    const a = Math.floor(SMLC.TOTAL_MONTHS * y / SMLC.CYCLE_YEARS);
-    const b = Math.floor(SMLC.TOTAL_MONTHS * (y - 1) / SMLC.CYCLE_YEARS);
-    return (a - b) === 13;
+    if (y < 1 || y > SMLC.CYCLE_YEARS) throw new RangeError("Year must be 1–334");
+    const A = Math.floor(SMLC.TOTAL_MONTHS * y / SMLC.CYCLE_YEARS);
+    const B = Math.floor(SMLC.TOTAL_MONTHS * (y - 1) / SMLC.CYCLE_YEARS);
+    return (A - B) === 13;
   };
 
+  // Months alternate 30/29; leap month duplicates Month 6 (after monthIndex 5)
   SMLC.generateMonths = function (year) {
     const months = [];
     let lunar = 0;
@@ -72,32 +74,152 @@
 
     for (let i = 0; i < 12; i++) {
       lunar++;
-      months.push({ length: lunar % 2 ? 30 : 29, leap: false });
+      months.push({ length: (lunar % 2 ? 30 : 29), leap: false });
 
-      if (leap && i === 5) {
-        months.push({ length: lunar % 2 ? 30 : 29, leap: true });
+      if (leap && i === 5) { // after Month 6
+        months.push({ length: (lunar % 2 ? 30 : 29), leap: true });
       }
     }
     return months;
   };
 
-  /* =========================
-     ABSOLUTE DAY CONVERSION
-     ========================= */
+  // Interdays: Yearsend + High Yearsend (leap years)
+  SMLC.interdaysCount = function (year) {
+    return SMLC.isLeapYear(year) ? 2 : 1;
+  };
+
+  // ===== Absolute day from epoch (0 = 2000-03-20) =====
   SMLC.daysBeforeYear = function (year) {
     let days = 0;
     for (let y = 1; y < year; y++) {
       SMLC.generateMonths(y).forEach(m => days += m.length);
-      days += SMLC.isLeapYear(y) ? 2 : 1;
+      days += SMLC.interdaysCount(y);
     }
     return days;
   };
 
-  SMLC.absoluteToMLC = function (abs) {
+  // abs -> SMLC date
+  SMLC.absoluteToSMLC = function (abs) {
     let year = 1;
     while (SMLC.daysBeforeYear(year + 1) <= abs) year++;
 
     let rem = abs - SMLC.daysBeforeYear(year);
     const months = SMLC.generateMonths(year);
 
-    for (let i = 0;
+    for (let i = 0; i < months.length; i++) {
+      if (rem < months[i].length) {
+        return { year, monthIndex: i, day: rem + 1, interday: false };
+      }
+      rem -= months[i].length;
+    }
+
+    // interdays
+    const interCount = SMLC.interdaysCount(year);
+    if (rem >= 0 && rem < interCount) {
+      return {
+        year,
+        interday: true,
+        name: rem === 0 ? "Yearsend" : "High Yearsend"
+      };
+    }
+
+    throw new Error("absoluteToSMLC(): out of range");
+  };
+
+  // SMLC -> abs
+  SMLC.smlcToAbsolute = function (year, month, day) {
+    const months = SMLC.generateMonths(year);
+    if (month < 1 || month > months.length) throw new RangeError("Month out of range");
+    const m = months[month - 1];
+    if (day < 1 || day > m.length) throw new RangeError("Day out of range");
+
+    let abs = SMLC.daysBeforeYear(year);
+    for (let i = 0; i < month - 1; i++) abs += months[i].length;
+    abs += (day - 1);
+    return abs;
+  };
+
+  // Gregorian -> SMLC
+  SMLC.gregorianToSMLC = function (y, m, d) {
+    const jdn = SMLC.gregorianToJDN(y, m, d);
+    const abs = jdn - SMLC.EPOCH_JDN;
+    return SMLC.absoluteToSMLC(abs);
+  };
+
+  // SMLC -> Gregorian
+  SMLC.smlcToGregorian = function (year, month, day) {
+    const abs = SMLC.smlcToAbsolute(year, month, day);
+    return SMLC.jdnToGregorian(abs + SMLC.EPOCH_JDN);
+  };
+
+  // ===== Easter (Meeus/Jones/Butcher) =====
+  SMLC.gregorianEaster = function (year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return { month, day };
+  };
+
+  // ===== Holidays =====
+  // Note: Some holidays are SMLC-fixed; some are Gregorian-mapped.
+  SMLC.getHoliday = function (smlcYear, monthIndex, day) {
+    // Fixed SMLC holidays:
+    const fixed = [
+      { m: 0, d: 1, name: "Year Day" },
+      { m: 5, d: 16, name: "Midsummer" },
+      { m: 11, d: 15, name: "Christmas" }
+    ];
+    for (const h of fixed) if (h.m === monthIndex && h.d === day) return h.name;
+
+    // Seasonal anchors:
+    for (const s of SMLC.SEASONS) {
+      if (s.monthIndex === monthIndex && s.day === day) return s.name;
+    }
+
+    // Gregorian-mapped holidays:
+    // We compute candidates for gregYear around this SMLC year (boundary-safe).
+    const candidates = [1998 + smlcYear, 1999 + smlcYear, 2000 + smlcYear];
+
+    // Easter
+    for (const gy of candidates) {
+      const eas = SMLC.gregorianEaster(gy);
+      const smlc = SMLC.gregorianToSMLC(gy, eas.month, eas.day);
+      if (!smlc.interday && smlc.year === smlcYear && smlc.monthIndex === monthIndex && smlc.day === day) {
+        return "Easter";
+      }
+    }
+
+    // U.S. Independence Day (July 4)
+    for (const gy of candidates) {
+      const smlc = SMLC.gregorianToSMLC(gy, 7, 4);
+      if (!smlc.interday && smlc.year === smlcYear && smlc.monthIndex === monthIndex && smlc.day === day) {
+        return "U.S. Independence Day";
+      }
+    }
+
+    return null;
+  };
+
+  // ===== Today =====
+  SMLC.today = function () {
+    const now = new Date();
+    return {
+      now,
+      smlc: SMLC.gregorianToSMLC(now.getFullYear(), now.getMonth() + 1, now.getDate())
+    };
+  };
+
+  // Export
+  window.SMLC = SMLC;
+})();
