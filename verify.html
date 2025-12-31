@@ -2,43 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Calendar Verification</title>
+  <title>Verify — Scots Millennial Lunisolar Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header>
-  <h1>Verification & Known Dates</h1>
+  <h1>Verification</h1>
   <nav>
     <a href="index.html">Home</a>
     <a href="calendar.html">Calendar</a>
+    <a href="convert.html">Convert</a>
   </nav>
 </header>
 
 <main>
-  <ul>
-    <li>
-      <strong>Gregorian:</strong> 2000-03-20 →
-      <strong>MLC:</strong> Eastren 1, Year 1
-    </li>
-    <li>
-      <strong>Gregorian:</strong> 2002-12-25 →
-      <strong>MLC:</strong> Darkmonth (Christmas)
-    </li>
-    <li>
-      <strong>Gregorian:</strong> 2025-12-31 →
-      <strong>MLC:</strong> Waning 7, Year 26
-    </li>
-    <li>
-      <strong>Gregorian:</strong> July 4 →
-      <strong>MLC:</strong> U.S. Independence Day (mapped)
-    </li>
-  </ul>
+  <div class="banner" id="verifyBanner">Running checks…</div>
 
-  <p>
-    All conversions are computed from a fixed epoch and are reversible.
-  </p>
+  <h2>Core invariants</h2>
+  <ul id="invariants"></ul>
+
+  <h2>Known dates</h2>
+  <ul id="knownDates"></ul>
 </main>
+
+<script src="js/smlc.js"></script>
+<script src="js/verify.js"></script>
 
 </body>
 </html>
