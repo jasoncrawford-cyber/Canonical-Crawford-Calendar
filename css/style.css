@@ -2,7 +2,8 @@
   --bg: #fdfcf9;
   --ink: #1e1e1e;
   --accent: #3a6ea5;
-  --rest: #e6eef7;
+  --rest: #eef2d0;
+  --today: #ffeb3b;
 }
 
 * {
@@ -32,18 +33,11 @@ main {
   padding: 2rem;
 }
 
-.hero {
-  max-width: 640px;
-}
-
-.button {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  background: var(--accent);
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
+.banner {
+  background: #fff8c4;
+  border: 1px solid #e6d200;
+  padding: 1rem;
+  margin-bottom: 2rem;
 }
 
 .calendar {
@@ -64,5 +58,7 @@ main {
 }
 
 .today {
-  border: 2px solid var(--accent);
+  background: var(--today);
+  border: 2px solid #c9b800;
 }
+
