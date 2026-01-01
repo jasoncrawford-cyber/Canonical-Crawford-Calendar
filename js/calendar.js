@@ -3,15 +3,32 @@
 
   function pad2(n){ return String(n).padStart(2,"0"); }
 
+  // Leap-month naming rule: leap month repeats Month 6 name
+  function mapMonthNameIndex(year, monthIndex){
+    const months = SMLC.generateMonths(year);
+    const leapExists = months.length === 13;
+    if (!leapExists) return monthIndex;
+
+    // In leap years:
+    // indices 0..5 normal
+    // index 6 = leap copy of 5
+    // indices 7..12 map to 6..11
+    if (monthIndex === 6) return 5;
+    if (monthIndex >= 7) return monthIndex - 1;
+    return monthIndex;
+  }
+
   function setBanner(todayObj){
     const banner = document.getElementById("todayBanner");
     const now = todayObj.now;
     const t = todayObj.smlc;
 
+    const g = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+
     if (t.interday) {
       banner.innerHTML = `
         <strong>Today (SMLC):</strong> ${t.name}, Year ${t.year}<br>
-        <em>Gregorian:</em> ${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}
+        <em>Gregorian:</em> ${g}
       `;
       return;
     }
@@ -19,21 +36,30 @@
     const monthName = SMLC.MONTH_NAMES[mapMonthNameIndex(t.year, t.monthIndex)];
     banner.innerHTML = `
       <strong>Today (SMLC):</strong> ${monthName} ${t.day}, Year ${t.year}<br>
-      <em>Gregorian:</em> ${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}
+      <em>Gregorian:</em> ${g}
     `;
   }
 
-  // If a leap month exists after Month 6, its name is Month 6 again.
-  function mapMonthNameIndex(year, monthIndex){
-    const months = SMLC.generateMonths(year);
-    // monthIndex is 0-based in generated months
-    // Name mapping: indices 0..5 map normally; leap (index 6 if exists) maps back to 5; after that shift by -1.
-    const leapExists = months.length === 13;
-    if (!leapExists) return monthIndex;
-    // In a leap year, months are: 0..5 (normal), 6 (leap copy of 5), 7..12 (map to 6..11)
-    if (monthIndex === 6) return 5;
-    if (monthIndex >= 7) return monthIndex - 1;
-    return monthIndex;
+  function updateInterdaysPanel(year){
+    const panel = document.getElementById("interdaysPanel");
+    const leap = SMLC.isLeapYear(year);
+
+    const items = leap
+      ? ["Yearsend", "High Yearsend"]
+      : ["Yearsend"];
+
+    panel.innerHTML = `
+      <strong>Interdays (outside the weekly grid)</strong><br>
+      <span class="small-muted">
+        These occur after Darkmonth and do not belong to Foreday–Yondday.
+      </span>
+      <ul style="margin:0.5rem 0 0 1.1rem;">
+        ${items.map(n => `<li>${n}</li>`).join("")}
+      </ul>
+      <div class="small-muted">
+        This year is <strong>${leap ? "a leap-month year (13 months)" : "a common year (12 months)"}</strong>.
+      </div>
+    `;
   }
 
   function renderYear(year, highlight){
@@ -60,7 +86,7 @@
       }
       out.appendChild(header);
 
-      // Day cells: month always starts Foreday
+      // Day cells — month always starts Foreday
       const grid = document.createElement("div");
       grid.className = "calendar-grid";
 
@@ -76,7 +102,7 @@
           cell.classList.add("today");
         }
 
-        const holiday = SMLC.getHoliday(year, idx, d);
+        const holiday = SMLC.getHoliday ? SMLC.getHoliday(year, idx, d) : null;
 
         cell.innerHTML = `<strong>${d}</strong>`;
         if (holiday) {
@@ -93,21 +119,61 @@
     });
   }
 
+  function clampYear(y){
+    if (!Number.isFinite(y)) return 1;
+    return Math.min(334, Math.max(1, y));
+  }
+
   function main(){
     const yearInput = document.getElementById("yearInput");
-    const btn = document.getElementById("showYearBtn");
+    const showBtn = document.getElementById("showYearBtn");
+    const prevBtn = document.getElementById("prevYearBtn");
+    const nextBtn = document.getElementById("nextYearBtn");
+    const todayBtn = document.getElementById("todayYearBtn");
 
     try {
       const todayObj = SMLC.today();
+      const today = todayObj.smlc;
+
       setBanner(todayObj);
 
-      // Default year = today’s year
-      yearInput.value = todayObj.smlc.year;
-      renderYear(todayObj.smlc.year, todayObj.smlc);
+      // Snap year picker to today by default
+      yearInput.value = today.year;
 
-      btn.addEventListener("click", () => {
-        const y = Number(yearInput.value);
-        renderYear(y, null);
+      updateInterdaysPanel(today.year);
+      renderYear(today.year, today);
+
+      function renderSelectedYear(){
+        const y = clampYear(Number(yearInput.value));
+        yearInput.value = y;
+
+        updateInterdaysPanel(y);
+
+        // Only highlight “today” if viewing today’s year
+        const highlight = (y === today.year) ? today : null;
+        renderYear(y, highlight);
+      }
+
+      showBtn.addEventListener("click", renderSelectedYear);
+
+      prevBtn.addEventListener("click", () => {
+        yearInput.value = clampYear(Number(yearInput.value) - 1);
+        renderSelectedYear();
+      });
+
+      nextBtn.addEventListener("click", () => {
+        yearInput.value = clampYear(Number(yearInput.value) + 1);
+        renderSelectedYear();
+      });
+
+      todayBtn.addEventListener("click", () => {
+        yearInput.value = today.year;
+        renderSelectedYear();
+      });
+
+      // Optional: change year and press Enter
+      yearInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") renderSelectedYear();
       });
 
     } catch (e) {
