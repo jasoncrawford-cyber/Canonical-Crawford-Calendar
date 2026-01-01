@@ -8,8 +8,16 @@
 </head>
 <body>
 
-<header>
-  <h1>Scots Millennial Lunisolar Calendar</h1>
+<header class="site-header">
+  <div class="brand">
+    <!-- optional logo; remove this <img> if you don't want it -->
+    <img class="brand-logo" src="assets/crawford-crest.png" alt="Crawford Household crest" />
+    <div class="brand-text">
+      <h1>Scots Millennial Lunisolar Calendar</h1>
+      <div class="small-muted">Fortis Sub Cruce</div>
+    </div>
+  </div>
+
   <nav>
     <a href="index.html">Home</a>
     <a href="convert.html">Convert</a>
@@ -22,14 +30,24 @@
   <div id="todayBanner" class="banner">Loading…</div>
 
   <div class="controls">
-    <label><strong>SMLC Year (1–334):</strong></label>
-    <input id="yearInput" type="number" min="1" max="334" />
-    <button id="showYearBtn">Show Year</button>
+    <button id="prevYearBtn" type="button">◀</button>
+
+    <label for="yearInput"><strong>SMLC Year (1–334):</strong></label>
+    <input id="yearInput" type="number" min="1" max="334" inputmode="numeric" />
+
+    <button id="nextYearBtn" type="button">▶</button>
+    <button id="todayYearBtn" type="button">Today</button>
+
+    <button id="showYearBtn" type="button">Show Year</button>
   </div>
+
+  <!-- ✅ THIS WAS MISSING (and caused your null.innerHTML error) -->
+  <div id="interdaysPanel" class="panel"></div>
 
   <div id="output"></div>
 </main>
 
+<!-- IMPORTANT: only these two scripts -->
 <script src="js/smlc.js"></script>
 <script src="js/calendar.js"></script>
 
