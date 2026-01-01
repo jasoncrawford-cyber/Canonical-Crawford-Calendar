@@ -21,17 +21,35 @@ body{
   color:var(--ink);
 }
 
-header{
+/* HEADER */
+.site-header{
   padding:1rem;
   background:var(--card);
   border-bottom:1px solid var(--line);
+}
+
+.brand{
+  display:flex;
+  gap:0.9rem;
+  align-items:center;
+}
+
+.brand-logo{
+  width:64px;
+  height:auto;
+  border-radius:10px;
+}
+
+.brand-text h1{
+  margin:0;
+  font-size:1.6rem;
 }
 
 nav{
   display:flex;
   flex-wrap:wrap;
   gap:1rem;
-  margin-top:0.5rem;
+  margin-top:0.75rem;
 }
 
 nav a{
@@ -41,23 +59,6 @@ nav a{
 
 main{ padding:1rem; }
 
-.hero{ max-width: 720px; }
-
-.button{
-  display:inline-block;
-  margin-top:1rem;
-  padding:0.6rem 1.2rem;
-  background:var(--accent);
-  color:white;
-  text-decoration:none;
-  border-radius:6px;
-}
-
-footer{
-  padding:1rem;
-  color:var(--muted);
-}
-
 .banner{
   background:#fff8c4;
   border:1px solid #e6d200;
@@ -66,12 +67,20 @@ footer{
   border-radius:8px;
 }
 
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:0.75rem;
+  margin-bottom:1rem;
+}
+
 .controls{
   display:flex;
   flex-wrap:wrap;
   gap:0.5rem;
   align-items:center;
-  margin-bottom:1rem;
+  margin-bottom:0.75rem;
 }
 
 .controls input{
@@ -130,8 +139,10 @@ h3{ margin: 1.2rem 0 0.6rem; }
 
 .small-muted{ color:var(--muted); }
 
+/* MOBILE */
 @media (max-width:600px){
-  h1{ font-size:1.4rem; }
+  .brand-logo{ width:52px; }
+  .brand-text h1{ font-size:1.25rem; }
   .cell{ font-size:0.70rem; padding:0.32rem; }
   .controls input{ width: 6.2rem; }
 }
