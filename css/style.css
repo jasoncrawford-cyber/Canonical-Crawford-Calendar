@@ -21,7 +21,6 @@ body{
   color:var(--ink);
 }
 
-/* HEADER */
 .site-header{
   padding:1rem;
   background:var(--card);
@@ -139,7 +138,6 @@ h3{ margin: 1.2rem 0 0.6rem; }
 
 .small-muted{ color:var(--muted); }
 
-/* MOBILE */
 @media (max-width:600px){
   .brand-logo{ width:52px; }
   .brand-text h1{ font-size:1.25rem; }
