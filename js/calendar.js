@@ -1,29 +1,25 @@
 (function () {
   "use strict";
 
-  function pad2(n){ return String(n).padStart(2,"0"); }
+  const $ = (id) => document.getElementById(id);
+  const pad2 = (n) => String(n).padStart(2, "0");
 
-  // Leap-month naming rule: leap month repeats Month 6 name
-  function mapMonthNameIndex(year, monthIndex){
+  function mapMonthNameIndex(year, monthIndex) {
     const months = SMLC.generateMonths(year);
     const leapExists = months.length === 13;
     if (!leapExists) return monthIndex;
-
-    // In leap years:
-    // indices 0..5 normal
-    // index 6 = leap copy of 5
-    // indices 7..12 map to 6..11
     if (monthIndex === 6) return 5;
     if (monthIndex >= 7) return monthIndex - 1;
     return monthIndex;
   }
 
-  function setBanner(todayObj){
-    const banner = document.getElementById("todayBanner");
+  function setBanner(todayObj) {
+    const banner = $("todayBanner");
+    if (!banner) return;
+
     const now = todayObj.now;
     const t = todayObj.smlc;
-
-    const g = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+    const g = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
 
     if (t.interday) {
       banner.innerHTML = `
@@ -40,13 +36,12 @@
     `;
   }
 
-  function updateInterdaysPanel(year){
-    const panel = document.getElementById("interdaysPanel");
-    const leap = SMLC.isLeapYear(year);
+  function updateInterdaysPanel(year) {
+    const panel = $("interdaysPanel");
+    if (!panel) return; // ✅ prevents your null.innerHTML crash
 
-    const items = leap
-      ? ["Yearsend", "High Yearsend"]
-      : ["Yearsend"];
+    const leap = SMLC.isLeapYear(year);
+    const items = leap ? ["Yearsend", "High Yearsend"] : ["Yearsend"];
 
     panel.innerHTML = `
       <strong>Interdays (outside the weekly grid)</strong><br>
@@ -62,8 +57,10 @@
     `;
   }
 
-  function renderYear(year, highlight){
-    const out = document.getElementById("output");
+  function renderYear(year, highlight) {
+    const out = $("output");
+    if (!out) return;
+
     out.innerHTML = "";
 
     const months = SMLC.generateMonths(year);
@@ -75,7 +72,6 @@
       h.textContent = (m.leap ? `${monthName} (Leap)` : monthName) + ` — ${m.length} days`;
       out.appendChild(h);
 
-      // Weekday header row
       const header = document.createElement("div");
       header.className = "calendar-grid";
       for (const w of SMLC.WEEKDAYS) {
@@ -86,7 +82,6 @@
       }
       out.appendChild(header);
 
-      // Day cells — month always starts Foreday
       const grid = document.createElement("div");
       grid.className = "calendar-grid";
 
@@ -94,11 +89,15 @@
         const cell = document.createElement("div");
         cell.className = "cell";
 
-        const weekday = SMLC.WEEKDAYS[(d - 1) % 7];
+        const weekday = SMLC.WEEKDAYS[(d - 1) % 7]; // month always starts Foreday
         if (weekday === "Restday" || weekday === "Yondday") cell.classList.add("rest");
 
-        if (highlight && !highlight.interday &&
-            highlight.year === year && highlight.monthIndex === idx && highlight.day === d) {
+        if (
+          highlight && !highlight.interday &&
+          highlight.year === year &&
+          highlight.monthIndex === idx &&
+          highlight.day === d
+        ) {
           cell.classList.add("today");
         }
 
@@ -119,66 +118,52 @@
     });
   }
 
-  function clampYear(y){
+  function clampYear(y) {
     if (!Number.isFinite(y)) return 1;
     return Math.min(334, Math.max(1, y));
   }
 
-  function main(){
-    const yearInput = document.getElementById("yearInput");
-    const showBtn = document.getElementById("showYearBtn");
-    const prevBtn = document.getElementById("prevYearBtn");
-    const nextBtn = document.getElementById("nextYearBtn");
-    const todayBtn = document.getElementById("todayYearBtn");
+  function main() {
+    const banner = $("todayBanner");
 
     try {
+      // Required elements
+      const yearInput = $("yearInput");
+      const showBtn = $("showYearBtn");
+      if (!yearInput || !showBtn) {
+        throw new Error("calendar.html is missing #yearInput or #showYearBtn (wrong file version).");
+      }
+
+      const prevBtn = $("prevYearBtn");
+      const nextBtn = $("nextYearBtn");
+      const todayBtn = $("todayYearBtn");
+
       const todayObj = SMLC.today();
       const today = todayObj.smlc;
 
       setBanner(todayObj);
 
-      // Snap year picker to today by default
       yearInput.value = today.year;
-
       updateInterdaysPanel(today.year);
       renderYear(today.year, today);
 
-      function renderSelectedYear(){
+      function renderSelected() {
         const y = clampYear(Number(yearInput.value));
         yearInput.value = y;
-
         updateInterdaysPanel(y);
-
-        // Only highlight “today” if viewing today’s year
-        const highlight = (y === today.year) ? today : null;
-        renderYear(y, highlight);
+        renderYear(y, (y === today.year) ? today : null);
       }
 
-      showBtn.addEventListener("click", renderSelectedYear);
+      showBtn.addEventListener("click", renderSelected);
 
-      prevBtn.addEventListener("click", () => {
-        yearInput.value = clampYear(Number(yearInput.value) - 1);
-        renderSelectedYear();
-      });
+      if (prevBtn) prevBtn.addEventListener("click", () => { yearInput.value = clampYear(Number(yearInput.value) - 1); renderSelected(); });
+      if (nextBtn) nextBtn.addEventListener("click", () => { yearInput.value = clampYear(Number(yearInput.value) + 1); renderSelected(); });
+      if (todayBtn) todayBtn.addEventListener("click", () => { yearInput.value = today.year; renderSelected(); });
 
-      nextBtn.addEventListener("click", () => {
-        yearInput.value = clampYear(Number(yearInput.value) + 1);
-        renderSelectedYear();
-      });
-
-      todayBtn.addEventListener("click", () => {
-        yearInput.value = today.year;
-        renderSelectedYear();
-      });
-
-      // Optional: change year and press Enter
-      yearInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") renderSelectedYear();
-      });
+      yearInput.addEventListener("keydown", (e) => { if (e.key === "Enter") renderSelected(); });
 
     } catch (e) {
-      document.getElementById("todayBanner").innerHTML =
-        `<strong>Error:</strong> ${e.message}`;
+      if (banner) banner.innerHTML = `<strong>Error:</strong> ${e.message}`;
       console.error(e);
     }
   }
