@@ -63,15 +63,35 @@
     out.innerHTML = "";
 
     const months = SMLC.generateMonths(year);
+    const absYearStart = SMLC.daysBeforeYear(year);
+
+    // cumulative day count through months
+    let cumDays = 0;
 
     months.forEach((m, idx) => {
-      const h = document.createElement("h3");
       const nameIndex = mapMonthNameIndex(year, idx);
       const monthName = SMLC.MONTH_NAMES[nameIndex];
+
+      // Month header
+      const h = document.createElement("h3");
       h.textContent = (m.leap ? `${monthName} (Leap)` : monthName) + ` — ${m.length} days`;
       out.appendChild(h);
 
-      // weekday headers
+      // Solar-year position at END of this month
+      // "end of month" boundary = start + cumDays + monthLength
+      const absMonthEnd = absYearStart + cumDays + m.length;
+      const solar = SMLC.solarYearPosition(absMonthEnd);
+
+      const meta = document.createElement("div");
+      meta.className = "month-meta small-muted";
+      meta.innerHTML = `
+        Solar year position at month end:
+        <strong>${(solar.fraction * 100).toFixed(2)}%</strong>
+        (${SMLC.formatDayTime(solar.daysSinceEpochYearStart)} since epoch equinox)
+      `;
+      out.appendChild(meta);
+
+      // Weekday headers
       const header = document.createElement("div");
       header.className = "calendar-grid";
       for (const w of SMLC.WEEKDAYS) {
@@ -82,7 +102,7 @@
       }
       out.appendChild(header);
 
-      // day cells (month always starts Foreday)
+      // Day cells
       const grid = document.createElement("div");
       grid.className = "calendar-grid";
 
@@ -91,12 +111,9 @@
         cell.className = "cell";
 
         const weekday = SMLC.WEEKDAYS[(d - 1) % 7];
-
-        // ✅ distinct classes for styling/badges
         if (weekday === "Restday") cell.classList.add("restday");
         if (weekday === "Yondday") cell.classList.add("yondday");
 
-        // highlight today (yellow)
         if (
           highlight && !highlight.interday &&
           highlight.year === year &&
@@ -106,20 +123,28 @@
           cell.classList.add("today");
         }
 
+        // Absolute day for this SMLC date
+        const abs = absYearStart + cumDays + (d - 1);
+        const jdn = SMLC.EPOCH_JDN + abs;
+
+        // Phase at "noon" (jdn + 0.5) for stability
+        const phase = SMLC.moonPhaseForJDN(jdn + 0.5);
+
         const holiday = SMLC.getHoliday ? SMLC.getHoliday(year, idx, d) : null;
 
-        cell.innerHTML = `<strong>${d}</strong>`;
-        if (holiday) {
-          const span = document.createElement("span");
-          span.className = "holiday";
-          span.textContent = holiday;
-          cell.appendChild(span);
-        }
+        cell.innerHTML = `
+          <div class="dayline">
+            <strong>${d}</strong>
+            <span class="phase" title="${phase.name} • age ${phase.ageDays.toFixed(1)}d • illum ${(phase.illumination*100).toFixed(0)}%">${phase.emoji}</span>
+          </div>
+          ${holiday ? `<span class="holiday">${holiday}</span>` : ""}
+        `;
 
         grid.appendChild(cell);
       }
 
       out.appendChild(grid);
+      cumDays += m.length;
     });
   }
 
@@ -153,25 +178,11 @@
       }
 
       showBtn.addEventListener("click", renderSelected);
+      if (prevBtn) prevBtn.addEventListener("click", () => { yearInput.value = clampYear(Number(yearInput.value) - 1); renderSelected(); });
+      if (nextBtn) nextBtn.addEventListener("click", () => { yearInput.value = clampYear(Number(yearInput.value) + 1); renderSelected(); });
+      if (todayBtn) todayBtn.addEventListener("click", () => { yearInput.value = today.year; renderSelected(); });
 
-      if (prevBtn) prevBtn.addEventListener("click", () => {
-        yearInput.value = clampYear(Number(yearInput.value) - 1);
-        renderSelected();
-      });
-
-      if (nextBtn) nextBtn.addEventListener("click", () => {
-        yearInput.value = clampYear(Number(yearInput.value) + 1);
-        renderSelected();
-      });
-
-      if (todayBtn) todayBtn.addEventListener("click", () => {
-        yearInput.value = today.year;
-        renderSelected();
-      });
-
-      yearInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") renderSelected();
-      });
+      yearInput.addEventListener("keydown", (e) => { if (e.key === "Enter") renderSelected(); });
 
     } catch (e) {
       const banner = $("todayBanner");
