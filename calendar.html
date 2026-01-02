@@ -4,14 +4,23 @@
   <meta charset="UTF-8" />
   <title>Scots Millennial Lunisolar Calendar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Cache-bust to prevent GitHub Pages stale CSS -->
+  <link rel="stylesheet" href="./css/style.css?v=20260102" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="brand">
-    <!-- optional logo; remove this <img> if you don't want it -->
-    <img class="brand-logo" src="assets/crawford-crest.png" alt="Crawford Household crest" />
+    <!-- width/height ensures logo never renders huge even if CSS fails -->
+    <img
+      class="brand-logo"
+      src="./assets/crawford-crest.png"
+      alt="Crawford Household crest"
+      width="64"
+      height="64"
+      style="width:64px;height:64px;object-fit:contain;"
+    />
     <div class="brand-text">
       <h1>Scots Millennial Lunisolar Calendar</h1>
       <div class="small-muted">Fortis Sub Cruce</div>
@@ -19,10 +28,10 @@
   </div>
 
   <nav>
-    <a href="index.html">Home</a>
-    <a href="convert.html">Convert</a>
-    <a href="verify.html">Verify</a>
-    <a href="about-epoch.html">Epoch</a>
+    <a href="./index.html">Home</a>
+    <a href="./convert.html">Convert</a>
+    <a href="./verify.html">Verify</a>
+    <a href="./about-epoch.html">Epoch</a>
   </nav>
 </header>
 
@@ -41,15 +50,28 @@
     <button id="showYearBtn" type="button">Show Year</button>
   </div>
 
-  <!-- ✅ THIS WAS MISSING (and caused your null.innerHTML error) -->
+  <!-- Toggles -->
+  <div class="toggles panel">
+    <label class="toggle">
+      <input id="toggleMoon" type="checkbox" />
+      <span>Show moon phases</span>
+    </label>
+
+    <label class="toggle">
+      <input id="toggleSolar" type="checkbox" />
+      <span>Show solar-year completion at month end</span>
+    </label>
+  </div>
+
+  <div id="moonLegend" class="panel" style="display:none;"></div>
+
   <div id="interdaysPanel" class="panel"></div>
 
   <div id="output"></div>
 </main>
 
-<!-- IMPORTANT: only these two scripts -->
-<script src="js/smlc.js"></script>
-<script src="js/calendar.js"></script>
+<script src="./js/smlc.js?v=20260102"></script>
+<script src="./js/calendar.js?v=20260102"></script>
 
 </body>
 </html>
