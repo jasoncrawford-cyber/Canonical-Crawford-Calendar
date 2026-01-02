@@ -1,17 +1,51 @@
-.month-meta{
-  margin-top: -0.35rem;
-  margin-bottom: 0.65rem;
+/* =========================================================
+   Scots Millennial Lunisolar Calendar (SMLC)
+   Saltire theme + calendar layout + moon phases + month meta
+   ========================================================= */
+
+:root{
+  /* Saltire palette */
+  --saltire-blue: #005EB8;
+  --saltire-blue-dark: #004a90;
+  --saltire-white: #ffffff;
+  --saltire-mist: #f3f7ff;
+  --saltire-line: #c6d6f2;
+
+  /* Text */
+  --ink: #0b1b2b;
+  --muted: #35506a;
+
+  /* Links + buttons */
+  --accent: var(--saltire-blue);
+  --accent-2: #0a7bdc;
+
+  /* Calendar highlights */
+  --rest-strong: rgba(0, 94, 184, 0.14);
+  --rest-border: rgba(0, 94, 184, 0.30);
+  --today: #ffeb3b;          /* keep yellow */
+  --today-border: #c9b800;
+
+  /* Surfaces */
+  --bg: var(--saltire-mist);
+  --card: var(--saltire-white);
+
+  /* Shadows */
+  --shadow-soft: 0 6px 18px rgba(0, 62, 140, 0.08);
+  --shadow-soft2: 0 10px 28px rgba(0, 62, 140, 0.08);
+  --shadow-tiny: 0 3px 10px rgba(0, 62, 140, 0.05);
+
+  /* Radii */
+  --r-sm: 10px;
+  --r-md: 12px;
+  --r-lg: 14px;
 }
 
-.dayline{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:0.4rem;
-}
+*{ box-sizing:border-box; }
+html, body { height: 100%; }
 
-.phase{
-  font-size: 1rem;
-  line-height: 1;
-  opacity: 0.95;
-}
+body{
+  margin:0;
+  font-family: system-ui, serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 20% 0%, #ffffff 0%, var(--
