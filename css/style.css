@@ -1,51 +1,312 @@
-/* =========================================================
-   Scots Millennial Lunisolar Calendar (SMLC)
-   Saltire theme + calendar layout + moon phases + month meta
-   ========================================================= */
-
 :root{
-  /* Saltire palette */
-  --saltire-blue: #005EB8;
-  --saltire-blue-dark: #004a90;
-  --saltire-white: #ffffff;
-  --saltire-mist: #f3f7ff;
-  --saltire-line: #c6d6f2;
+  --saltire-blue:#005EB8;
+  --saltire-blue-dark:#004a90;
+  --saltire-white:#ffffff;
+  --saltire-mist:#f3f7ff;
+  --saltire-line:#c6d6f2;
 
-  /* Text */
-  --ink: #0b1b2b;
-  --muted: #35506a;
+  --ink:#0b1b2b;
+  --muted:#35506a;
 
-  /* Links + buttons */
-  --accent: var(--saltire-blue);
-  --accent-2: #0a7bdc;
+  --accent:var(--saltire-blue);
+  --accent-2:#0a7bdc;
 
-  /* Calendar highlights */
-  --rest-strong: rgba(0, 94, 184, 0.14);
-  --rest-border: rgba(0, 94, 184, 0.30);
-  --today: #ffeb3b;          /* keep yellow */
-  --today-border: #c9b800;
+  --rest-strong:rgba(0,94,184,0.14);
+  --rest-border:rgba(0,94,184,0.30);
 
-  /* Surfaces */
-  --bg: var(--saltire-mist);
-  --card: var(--saltire-white);
+  --today:#ffeb3b;
+  --today-border:#c9b800;
 
-  /* Shadows */
-  --shadow-soft: 0 6px 18px rgba(0, 62, 140, 0.08);
-  --shadow-soft2: 0 10px 28px rgba(0, 62, 140, 0.08);
-  --shadow-tiny: 0 3px 10px rgba(0, 62, 140, 0.05);
+  --card:var(--saltire-white);
 
-  /* Radii */
-  --r-sm: 10px;
-  --r-md: 12px;
-  --r-lg: 14px;
+  --shadow-soft:0 6px 18px rgba(0,62,140,0.08);
+  --shadow-soft2:0 10px 28px rgba(0,62,140,0.08);
+  --shadow-tiny:0 3px 10px rgba(0,62,140,0.05);
+
+  --r-sm:10px;
+  --r-md:12px;
+  --r-lg:14px;
 }
 
 *{ box-sizing:border-box; }
-html, body { height: 100%; }
+html,body{ height:100%; }
 
 body{
   margin:0;
-  font-family: system-ui, serif;
-  color: var(--ink);
+  font-family:system-ui, serif;
+  color:var(--ink);
+  background:radial-gradient(1200px 600px at 20% 0%, #fff 0%, var(--saltire-mist) 40%, #eaf2ff 100%);
+  position:relative;
+}
+
+/* Saltire watermark */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:0.20;
   background:
-    radial-gradient(1200px 600px at 20% 0%, #ffffff 0%, var(--
+    linear-gradient(45deg, transparent 0%, transparent 45%, rgba(0,94,184,0.20) 48%, rgba(0,94,184,0.20) 52%, transparent 55%, transparent 100%),
+    linear-gradient(-45deg, transparent 0%, transparent 45%, rgba(0,94,184,0.20) 48%, rgba(0,94,184,0.20) 52%, transparent 55%, transparent 100%);
+}
+
+/* Default links outside header */
+a{ color:var(--accent); }
+a:hover{ color:var(--accent-2); }
+
+/* Header */
+.site-header{
+  padding:1rem;
+  color:var(--saltire-white);
+  background:linear-gradient(135deg, var(--saltire-blue) 0%, var(--saltire-blue-dark) 100%);
+  border-bottom:2px solid rgba(255,255,255,0.18);
+}
+
+.brand{
+  display:flex;
+  gap:0.9rem;
+  align-items:center;
+}
+
+.brand-logo{
+  width:64px;
+  height:auto;
+  border-radius:var(--r-md);
+  background:rgba(255,255,255,0.15);
+  padding:6px;
+}
+
+.brand-text h1{
+  margin:0;
+  font-size:1.6rem;
+  letter-spacing:0.3px;
+}
+
+.small-muted{ color:var(--muted); }
+.site-header .small-muted{ color:rgba(255,255,255,0.80); }
+
+.site-header nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+  margin-top:0.75rem;
+}
+
+.site-header nav a{
+  text-decoration:none;
+  color:rgba(255,255,255,0.95);
+  padding:0.25rem 0.45rem;
+  border-radius:8px;
+}
+
+.site-header nav a:hover{
+  background:rgba(255,255,255,0.14);
+}
+
+main{
+  padding:1rem;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+footer{
+  padding:1rem;
+  color:var(--muted);
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* Banner & panels */
+.banner{
+  background:var(--card);
+  border:1px solid var(--saltire-line);
+  padding:0.9rem;
+  margin-bottom:1rem;
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-soft);
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--saltire-line);
+  border-radius:var(--r-md);
+  padding:0.9rem;
+  margin-bottom:1rem;
+  box-shadow:0 6px 18px rgba(0,62,140,0.06);
+}
+
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  align-items:center;
+  margin-bottom:0.75rem;
+}
+
+.controls input{
+  width:7rem;
+  padding:0.45rem 0.55rem;
+  border:1px solid var(--saltire-line);
+  border-radius:var(--r-sm);
+  background:var(--card);
+  color:var(--ink);
+}
+
+.controls button{
+  padding:0.5rem 0.85rem;
+  background:var(--saltire-blue);
+  color:var(--saltire-white);
+  border:none;
+  border-radius:var(--r-sm);
+  cursor:pointer;
+  box-shadow:0 6px 14px rgba(0,94,184,0.18);
+}
+.controls button:hover{ background:var(--accent-2); }
+.controls button:active{ transform:translateY(1px); }
+
+/* Toggles */
+.toggles{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+  align-items:center;
+}
+.toggle{
+  display:flex;
+  gap:0.5rem;
+  align-items:center;
+  cursor:pointer;
+}
+.toggle input{ transform:scale(1.15); }
+
+/* Legend */
+.legend-row{
+  display:flex;
+  gap:0.6rem;
+  font-size:1.25rem;
+  margin:0.55rem 0 0.35rem;
+}
+
+/* Lists */
+.tight-list{
+  margin:0.5rem 0 0 1.2rem;
+  padding:0;
+}
+
+/* Month titles */
+h3{ margin:1.2rem 0 0.45rem; }
+
+.month-meta{
+  margin-top:-0.2rem;
+  margin-bottom:0.65rem;
+}
+
+/* Progress bar */
+.progress{
+  margin-top:0.45rem;
+  height:10px;
+  border-radius:999px;
+  background:rgba(0,94,184,0.10);
+  border:1px solid rgba(0,94,184,0.22);
+  overflow:hidden;
+}
+.progress .bar{
+  height:100%;
+  background:linear-gradient(90deg, var(--saltire-blue) 0%, var(--accent-2) 100%);
+  border-radius:999px;
+}
+
+/* Calendar */
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:0.35rem;
+  margin-bottom:1.2rem;
+}
+
+.cell{
+  border:1px solid var(--saltire-line);
+  padding:0.45rem;
+  min-height:3.35em;
+  font-size:0.78rem;
+  background:var(--card);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-tiny);
+  position:relative;
+  overflow:hidden;
+}
+
+.cell.header{
+  background:rgba(0,94,184,0.08);
+  font-weight:700;
+  text-align:center;
+  min-height:auto;
+}
+
+/* Restday/Yondday */
+.cell.restday,
+.cell.yondday{
+  background:var(--rest-strong);
+  border-color:var(--rest-border);
+}
+
+.cell.restday::after,
+.cell.yondday::after{
+  position:absolute;
+  top:6px;
+  right:8px;
+  font-weight:800;
+  font-size:0.70rem;
+  opacity:0.9;
+  color:var(--saltire-blue-dark);
+}
+.cell.restday::after{ content:"R"; }
+.cell.yondday::after{ content:"Y"; }
+
+/* Today */
+.cell.today{
+  background:var(--today) !important;
+  border:2px solid var(--today-border);
+}
+
+/* Day header line */
+.dayline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:0.4rem;
+}
+
+/* Moon icon */
+.phase{
+  font-size:1rem;
+  line-height:1;
+  opacity:0.95;
+}
+
+/* Holiday label */
+.cell .holiday{
+  display:block;
+  margin-top:0.2rem;
+  font-style:italic;
+  color:#0b1b2b;
+  opacity:0.9;
+}
+
+/* Mobile */
+@media (max-width:600px){
+  main{ padding:0.85rem; }
+  .brand-logo{ width:52px; }
+  .brand-text h1{ font-size:1.25rem; }
+
+  .cell{
+    font-size:0.70rem;
+    padding:0.34rem;
+    border-radius:10px;
+    min-height:3.1em;
+  }
+
+  .controls input{ width:6.2rem; }
+}
