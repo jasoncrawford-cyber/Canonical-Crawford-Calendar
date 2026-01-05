@@ -12,13 +12,33 @@
     return Math.min(334, Math.max(1, y));
   }
 
+  // Leap month repeats Month 6 name
   function mapMonthNameIndex(year, monthIndex){
     const months = SMLC.generateMonths(year);
     const leapExists = months.length === 13;
     if (!leapExists) return monthIndex;
-    if (monthIndex === 6) return 5;       // leap month repeats month 6 name
+    if (monthIndex === 6) return 5;
     if (monthIndex >= 7) return monthIndex - 1;
     return monthIndex;
+  }
+
+  // Weekday continuity: count ONLY "week days" (month days), excluding interdays.
+  function weekDaysBeforeYear(year){
+    let days = 0;
+    for (let y = 1; y < year; y++){
+      const months = SMLC.generateMonths(y);
+      for (const m of months) days += m.length;
+      // NOTE: interdays are excluded on purpose
+    }
+    return days;
+  }
+
+  function weekDayIndexForSmlcDate(year, monthIndex, day){
+    const months = SMLC.generateMonths(year);
+    let days = weekDaysBeforeYear(year);
+    for (let i = 0; i < monthIndex; i++) days += months[i].length;
+    days += (day - 1);
+    return ((days % 7) + 7) % 7;
   }
 
   function setBanner(todayObj){
@@ -35,7 +55,12 @@
     }
 
     const monthName = SMLC.MONTH_NAMES[mapMonthNameIndex(t.year, t.monthIndex)];
-    banner.innerHTML = `<strong>Today (SMLC):</strong> ${monthName} ${t.day}, Year ${t.year}<br><em>Gregorian:</em> ${g}`;
+    const w = SMLC.WEEKDAYS[weekDayIndexForSmlcDate(t.year, t.monthIndex, t.day)];
+
+    banner.innerHTML = `
+      <strong>Today (SMLC):</strong> ${monthName} ${t.day}, Year ${t.year} <span class="small-muted">(${w})</span><br>
+      <em>Gregorian:</em> ${g}
+    `;
   }
 
   function updateInterdaysPanel(year){
@@ -90,9 +115,11 @@
     out.innerHTML = "";
 
     const months = SMLC.generateMonths(year);
-    const absYearStart = SMLC.daysBeforeYear(year);
 
-    let cumDays = 0;
+    const absYearStart = SMLC.daysBeforeYear(year);   // includes interdays
+    const weekYearStart = weekDaysBeforeYear(year);   // excludes interdays
+
+    let cumMonthDays = 0; // month-days only (for week continuity + month positions)
 
     months.forEach((m, idx) => {
       const nameIndex = mapMonthNameIndex(year, idx);
@@ -102,9 +129,9 @@
       h.textContent = (m.leap ? `${monthName} (Leap)` : monthName) + ` — ${m.length} days`;
       out.appendChild(h);
 
-      // Month-end solar progress
+      // Month-end solar progress (same as before)
       if (opts.showSolar) {
-        const absMonthEnd = absYearStart + cumDays + m.length;
+        const absMonthEnd = absYearStart + cumMonthDays + m.length;
         const solar = SMLC.solarYearPosition(absMonthEnd);
         const pct = solar.fraction * 100;
 
@@ -121,7 +148,7 @@
         out.appendChild(meta);
       }
 
-      // weekday headers
+      // Weekday headers
       const header = document.createElement("div");
       header.className = "calendar-grid";
       for (const w of SMLC.WEEKDAYS) {
@@ -132,15 +159,26 @@
       }
       out.appendChild(header);
 
-      // day cells
+      // Grid with leading blanks so month starts on its natural weekday
       const grid = document.createElement("div");
       grid.className = "calendar-grid";
+
+      const monthStartWeekIndex = (weekYearStart + cumMonthDays) % 7;
+
+      for (let i = 0; i < monthStartWeekIndex; i++){
+        const blank = document.createElement("div");
+        blank.className = "cell empty";
+        blank.innerHTML = "&nbsp;";
+        grid.appendChild(blank);
+      }
 
       for (let d = 1; d <= m.length; d++) {
         const cell = document.createElement("div");
         cell.className = "cell";
 
-        const weekday = SMLC.WEEKDAYS[(d - 1) % 7];
+        const weekdayIndex = (monthStartWeekIndex + (d - 1)) % 7;
+        const weekday = SMLC.WEEKDAYS[weekdayIndex];
+
         if (weekday === "Restday") cell.classList.add("restday");
         if (weekday === "Yondday") cell.classList.add("yondday");
 
@@ -153,9 +191,9 @@
 
         let phaseHTML = "";
         if (opts.showMoon) {
-          const abs = absYearStart + cumDays + (d - 1);
+          const abs = absYearStart + cumMonthDays + (d - 1);
           const jdn = SMLC.EPOCH_JDN + abs;
-          const phase = SMLC.moonPhaseForJDN(jdn + 0.5); // noon-ish for stability
+          const phase = SMLC.moonPhaseForJDN(jdn + 0.5);
           phaseHTML = `<span class="phase" title="${phase.name} • age ${phase.ageDays.toFixed(1)}d • illum ${(phase.illumination*100).toFixed(0)}%">${phase.emoji}</span>`;
         }
 
@@ -171,7 +209,7 @@
       }
 
       out.appendChild(grid);
-      cumDays += m.length;
+      cumMonthDays += m.length;
     });
   }
 
@@ -180,7 +218,6 @@
     if (v === null) return fallback;
     return v === "true";
   }
-
   function writeBoolLS(key, val){
     localStorage.setItem(key, val ? "true" : "false");
   }
