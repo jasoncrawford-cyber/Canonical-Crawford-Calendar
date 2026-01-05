@@ -310,3 +310,10 @@ h3{ margin:1.2rem 0 0.45rem; }
 
   .controls input{ width:6.2rem; }
 }
+
+/* Month-leading blanks for continuous weekdays */
+.cell.empty{
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
